@@ -2,7 +2,6 @@
  * the art of code
  * ep_003
  * making a rectangle
- * 16.45
 */
 
 #ifdef GL_ES
@@ -19,7 +18,15 @@ float Circle(vec2 st, vec2 p, float r, float blur) {
 }
 
 float Band(float t, float start, float end, float blur) {
-    // ---
+    float step1 = smoothstep(start-blur, start+blur, t);
+    float step2 = smoothstep(end+blur, end-blur, t);
+    return step1 * step2;
+}
+
+float Rect(vec2 st, float left, float right, float bottom, float top, float blur) {
+    float band1 = Band(st.x, left, right, blur);
+    float band2 = Band(st.y, bottom, top, blur);
+    return band1*band2;
 }
 
 float Smiley(vec2 st, vec2 p, float size) {
@@ -45,7 +52,8 @@ void main(void) {
     vec3 col = vec3(0.);
 
     // float mask = Smiley(st, vec2(0., 0.1), 1.0);
-    float mask = smoothstep(-.2, .2, st.x);
+
+    float mask = Rect(st, -.2, .2, -.3, .3, .01);
     col = vec3(1., 1., 1.) * mask;
 
     gl_FragColor = vec4(col, 1.0);
